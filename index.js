@@ -1,26 +1,49 @@
-let express = require('express')
-let app = express()
+let express = require('express');
+let app = express();
 
-//Project 1
-//set Public Static Folder
+//Set Public Static Folder
 app.use(express.static(__dirname + '/public'));
 
-//use view engine
+//Use View Engine
 let expressHbs = require('express-handlebars');
+let helper = require('./controllers/helper');
 let hbs = expressHbs.create({
-    extname: 'hbs',
-    defaultLayout: 'layout',
-    layoutsDir: __dirname + '/views/layouts/',
-    partialsDir: __dirname + '/views/partials/'
+	extname: 'hbs',
+	defaultLayout: 'layout',
+	layoutsDir: __dirname + '/views/layouts',
+	partialsDir: __dirname + '/views/partials',
+	helpers: {
+		createStarList: helper.createStarList,
+		createStars: helper.createStars
+	}
 });
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 
-//define your routes here
-app.get('/', (req, res) =>{
-    res.render('index');
+// Define Your Routes Here
+// / =>index
+// /products => category
+// /products/:id => single-product
+
+// index.js => router/../Router.js => controllers/../Controller.js
+// project 3
+// heroku login
+// heroku git:remote -a ptudw-1985031
+// git add .
+// git commit -am 'add database'
+// git push heroku master
+
+app.use('/', require('./routes/indexRouter'));
+app.use('/products', require('./routes/productRouter'));
+
+app.get('/sync', (req, res) => {
+	let models = require('./models');
+	models.sequelize.sync().then(() => {
+		res.send('database sync completed');
+	});
 });
 
+//Create Params Route
 app.get('/:page', (req, res) => {
 	let banners = {
 		blog: 'Our blog',
@@ -39,8 +62,16 @@ app.get('/:page', (req, res) => {
 	res.render(page, { banner: banners[page] });
 });
 
-//set server port & start server
+//Set Server Port & Start Server
 app.set('port', process.env.PORT || 5000);
 app.listen(app.get('port'), () => {
-    console.log(`Server is running at port ${app.get('port')}`)
+	console.log(`Server is running at port ${app.get('port')}`);
 });
+
+//Project 5
+//xóa dữ liệu
+// delete from public."ProductColors" as "P1"
+// using public."ProductColors" as "P2"
+// where "P1"."id" > "P2"."id"
+// and "P1"."productId" = "P2"."productId"
+// and "P1"."colorId" = "P2"."colorId"
