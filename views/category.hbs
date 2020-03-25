@@ -67,25 +67,27 @@
           <!-- Start Filter Bar -->
           <div class="filter-bar d-flex flex-wrap align-items-center">
             <div class="sorting">
-              <select>
-                <option value="1">Default sorting</option>
-                <option value="1">Default sorting</option>
-                <option value="1">Default sorting</option>
+              <select id="sort" onchange="selectParam('sort', this.value)">
+                <option value="name">Default sorting by name</option>
+                <option value="price">Sorting by price Low to High</option>
+                <option value="overallReview">Sorting by reviews from High to Low</option>
               </select>
             </div>
             <div class="sorting mr-auto">
-              <select>
-                <option value="1">Show 12</option>
-                <option value="1">Show 12</option>
-                <option value="1">Show 12</option>
+              <select id="limit" onchange="selectParam('limit', this.value)">
+                <option value="9">Show 9</option>
+                <option value="18">Show 18</option>
+                <option value="36">Show 36</option>
               </select>
             </div>
             <div>
               <div class="input-group filter-bar-search">
-                <input type="text" placeholder="Search">
+                <form action="/products" method="GET">
+                <input type="text" name="search" placeholder="Search">
                 <div class="input-group-append">
-                  <button type="button"><i class="ti-search"></i></button>
+                  <button type="submit"><i class="ti-search"></i></button>
                 </div>
+                </form>
               </div>
             </div>
           </div>
@@ -112,6 +114,11 @@
                 </div>
               </div>
               {{/each}}
+            </div>
+            <div class="row justify-content-center">
+            <nav aria-label="Page navigation example" id="pagination">
+           {{{ createPagination pagination paginationClass="pagination"}}} 
+            </nav>
             </div>
           </section>
           <!-- End Best Seller -->
@@ -182,20 +189,44 @@
       brand: 0,
       color: 0,
       min: 0,
-      max: 100
+      max: 100,
+      limit: 9,
+      page: 1,
+      sort: 'name',
+      search: ''
     };
+
+    // Khởi tạo Params cho urlParams
     for(let key in params){
       if(!urlParams.has(key)){
         urlParams.append(key, params[key]);
       }
     }
 
-    for(let key in params) {
+    $(document).ready(() =>{
+      //Thiết lập trạng thái cho các checkboxes và filter
+      let checkboxes = ['category', 'brand', 'color'];
+    for(let key of checkboxes) {
       let control = $(`#${key}${urlParams.get(key)}`);
       if(control) {
         $(control).prop('checked', true);
       }
     }
+    //Thiết lập trạng thái cho combobox sort và limit
+    $('#sort').val(urlParams.get('sort'));
+    $('#limit').val(urlParams.get('limit'));
+    //Thiết lập trang thai va đường dẫn href cho phần phân trang
+    $('#pagination li').addClass('page-item');
+    $('#pagination li a').addClass('page-link');
+    let savePage= urlParams.get('page');
+    $('#pagination li a').each((index, item) => {
+        let page = $(item).attr('href').split('=')[1];
+        urlParams.set('page', page);
+        let href = '/products?' + urlParams.toString();
+        $(item).attr('href', href);
+      });
+      urlParams.set('page', savePage);
+    });
 
     function selectParam(key, value, reset = false){
       if(reset) {

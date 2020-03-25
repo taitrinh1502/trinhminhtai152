@@ -7,6 +7,7 @@ app.use(express.static(__dirname + '/public'));
 //Use View Engine
 let expressHbs = require('express-handlebars');
 let helper = require('./controllers/helper');
+let paginateHelper = require('express-handlebars-paginate')
 let hbs = expressHbs.create({
 	extname: 'hbs',
 	defaultLayout: 'layout',
@@ -14,7 +15,8 @@ let hbs = expressHbs.create({
 	partialsDir: __dirname + '/views/partials',
 	helpers: {
 		createStarList: helper.createStarList,
-		createStars: helper.createStars
+		createStars: helper.createStars,
+		createPagination: paginateHelper.createPagination
 	}
 });
 app.engine('hbs', hbs.engine);
@@ -24,14 +26,6 @@ app.set('view engine', 'hbs');
 // / =>index
 // /products => category
 // /products/:id => single-product
-
-// index.js => router/../Router.js => controllers/../Controller.js
-// project 3
-// heroku login
-// heroku git:remote -a ptudw-1985031
-// git add .
-// git commit -am 'add database'
-// git push heroku master
 
 app.use('/', require('./routes/indexRouter'));
 app.use('/products', require('./routes/productRouter'));
