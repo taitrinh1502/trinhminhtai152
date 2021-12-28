@@ -90,11 +90,3 @@ app.set('port', process.env.PORT || 5000);
 app.listen(app.get('port'), () => {
 	console.log(`Server is running at port ${app.get('port')}`);
 });
-
-//Project 5
-//xóa dữ liệu
-// delete from public."ProductColors" as "P1"
-// using public."ProductColors" as "P2"
-// where "P1"."id" > "P2"."id"
-// and "P1"."productId" = "P2"."productId"
-// and "P1"."colorId" = "P2"."colorId"
